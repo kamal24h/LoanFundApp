@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/authApi";
+import "./LoginPage.css";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -26,29 +27,31 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "50px auto" }}>
+    <div className="login-container">
       <h2>ورود به سیستم صندوق وام</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>ایمیل:</label>
+          <label htmlFor="email">ایمیل:</label>
           <input
-            style={{ width: "100%" }}
+            id="email"
+            placeholder="ایمیل خود را وارد کنید"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             type="email"
           />
         </div>
         <div>
-          <label>رمز عبور:</label>
+          <label htmlFor="password">رمز عبور:</label>
           <input
-            style={{ width: "100%" }}
+            id="password"
+            placeholder="رمز عبور خود را وارد کنید"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
           />
         </div>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit" style={{ marginTop: 10 }}>
+        {error && <p className="error-message">{error}</p>}
+        <button type="submit" className="submit-button">
           ورود
         </button>
       </form>
