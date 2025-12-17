@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/authApi";
+import { AxiosError } from "axios";
 import "./LoginPage.css";
 
 export default function LoginPage() {
@@ -21,8 +22,9 @@ export default function LoginPage() {
       } else {
         navigate("/member");
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
+    } catch (err) {
+      const error = err as AxiosError<{ message: string }>;
+      setError(error.response?.data?.message || "Login failed");
     }
   };
 

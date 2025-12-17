@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getLoanProducts, createLoanRequest, getMyLoans } from "../api/loanApi";
+import { AxiosError } from "axios";
 import styles from "./DashboardMember.module.css";
 
 interface LoanProduct {
@@ -20,6 +21,14 @@ interface Loan {
   status: string;
 }
 
+interface LoanApiResponse {
+  id: number;
+  principalAmount: number;
+  totalAmount: number;
+  installmentsCount: number;
+  status: string;
+}
+
 export default function DashboardMember() {
   const [products, setProducts] = useState<LoanProduct[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<number | null>(null);
@@ -33,7 +42,7 @@ export default function DashboardMember() {
       setProducts(p);
       const l = await getMyLoans();
       setLoans(
-        l.map((item: any) => ({
+        l.map((item: LoanApiResponse) => ({
           id: item.id,
           principalAmount: item.principalAmount,
           totalAmount: item.totalAmount,
@@ -52,8 +61,9 @@ export default function DashboardMember() {
     try {
       await createLoanRequest(selectedProduct, amount);
       setMessage("درخواست وام با موفقیت ثبت شد");
-    } catch (err: any) {
-      setMessage(err.response?.data?.message || "خطا در ثبت درخواست");
+    } catch (err: unknown) {
+      const axiosError = err as AxiosError<{ message: string }>;
+      setMessage(axiosError.response?.data?.message || "خطا در ثبت درخواست");
     }
   };
 
