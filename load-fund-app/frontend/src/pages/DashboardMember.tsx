@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getLoanProducts, createLoanRequest, getMyLoans } from "../api/loanApi";
+import styles from "./DashboardMember.module.css";
 
 interface LoanProduct {
   id: number;
@@ -57,13 +58,15 @@ export default function DashboardMember() {
   };
 
   return (
-    <div style={{ maxWidth: 800, margin: "20px auto" }}>
+    <div className={styles.container}>
       <h2>داشبورد عضو</h2>
 
       <h3>درخواست وام جدید</h3>
       <div>
         <label>نوع وام:</label>
         <select
+          name="ProductType"
+          aria-label="نوع وام"
           value={selectedProduct ?? ""}
           onChange={(e) => setSelectedProduct(Number(e.target.value))}
         >
@@ -76,20 +79,22 @@ export default function DashboardMember() {
         </select>
       </div>
       <div>
-        <label>مبلغ درخواستی:</label>
+        <label htmlFor="amountInput">مبلغ درخواستی:</label>
         <input
+          id="amountInput"
           type="number"
+          placeholder="مبلغ درخواستی را وارد کنید"
           value={amount}
           onChange={(e) => setAmount(Number(e.target.value))}
         />
       </div>
-      <button onClick={handleRequest} style={{ marginTop: 10 }}>
+      <button type="button" onClick={handleRequest} className={styles.submitButton}>
         ثبت درخواست وام
       </button>
       {message && <p>{message}</p>}
 
-      <h3 style={{ marginTop: 30 }}>لیست وام‌های من</h3>
-      <table width="100%" border={1} cellPadding={5}>
+      <h3 className={styles.loansTitle}>لیست وام‌های من</h3>
+      <table className={styles.table}>
         <thead>
           <tr>
             <th>کد</th>
