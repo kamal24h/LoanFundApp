@@ -1,14 +1,78 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  fullName     String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("member") // "admin" or "member"
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+
+  loans        Loan[]
+  loanRequests LoanRequest[]
+}
+
+model LoanProduct {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String?
+  maxAmount     Float
+  minAmount     Float
+  interestRate  Float
+  maxInstallments Int
+  isActive      Boolean  @default(true)
+
+  loanRequests  LoanRequest[]
+}
+
+model LoanRequest {
+  id             Int      @id @default(autoincrement())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         Int
+  loanProduct    LoanProduct @relation(fields: [loanProductId], references: [id])
+  loanProductId  Int
+  requestedAmount Float
+  status         String   @default("pending") // pending, approved, rejected
+  requestDate    DateTime @default(now())
+  decisionDate   DateTime?
+  adminNote      String?
+
+  loan           Loan?
+}
+
+model Loan {
+  id             Int      @id @default(autoincrement())
+  loanRequest    LoanRequest @relation(fields: [loanRequestId], references: [id])
+  loanRequestId  Int
+  user           User     @relation(fields: [userId], references: [id])
+  userId         Int
+  principalAmount Float
+  interestRate   Float
+  totalAmount    Float
+  installmentsCount Int
+  startDate      DateTime
+  endDate        DateTime
+  status         String   @default("active") // active, completed, overdue
+
+  installments   LoanInstallment[]
+}
+
+model LoanInstallment {
+  id              Int      @id @default(autoincrement())
+  loan            Loan     @relation(fields: [loanId], references: [id])
+  loanId          Int
+  installmentNumber Int
+  dueDate         DateTime
+  amount          Float
+  paidAmount      Float   @default(0)
+  paidDate        DateTime?
+  status          String  @default("unpaid") // unpaid, partial, paid, overdue
 }
